@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+// #include <climits>
 #include <set>
 #include <queue>
 #include <math.h>
@@ -336,7 +337,10 @@ vector<int> getNearbyGolems(int curGolemRow, int curGolemCol, int golem)
             int nxtCompCol = compGolemCol + dCol[d];
 
             if (isNearBy(curGolemRow, curGolemCol, nxtCompRow, nxtCompCol))
+            {
                 result.push_back(i);
+                break;
+            }
         }
     }
 
@@ -402,7 +406,7 @@ void Solve()
 
         // 골렘 위치 정보
         vector<pair<int,int>> golemPoses;
-        bool result = initGolemPos(0, curGolemCol, golemPoses);
+        bool result = initGolemPos(-1, curGolemCol, golemPoses);
 
         if (!result)
         {
@@ -521,6 +525,7 @@ void Solve()
         if (outOfMap == false)
         {
             GolemPos[k] = { curGolemRow, curGolemCol };
+            int finalExitDir = GolemExitDir[k];
             ans += lowest + 1;
             assert(lowest != -1);
 
