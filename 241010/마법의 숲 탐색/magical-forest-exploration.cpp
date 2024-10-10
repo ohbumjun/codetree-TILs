@@ -91,7 +91,7 @@ bool initGolemPos(int row, int col, vector<pair<int, int>>& poses)
     // 아래쪽
     poses.push_back({ row + 1, col });
 
-    if (Map[row + 1][col] != -1) // 아래 부분에 이미 골렘 있음
+    if (row + 1 >= 0 && Map[row + 1][col] != -1) // 아래 부분에 이미 골렘 있음
         return false;
 
     return true;
@@ -395,7 +395,7 @@ void Solve()
         pair<int,int> golemInfo = GolemStInfo[k];
         // curRow, curCol 은, 골렘의 위치이다.
         int curGolemCol = golemInfo.first;
-        int curGolemRow = -1;
+        int curGolemRow = -2;
         int nxtGolemRow = curGolemRow;
         int nxtGolemCol = curGolemCol;
 
@@ -406,7 +406,7 @@ void Solve()
 
         // 골렘 위치 정보
         vector<pair<int,int>> golemPoses;
-        bool result = initGolemPos(-1, curGolemCol, golemPoses);
+        bool result = initGolemPos(curGolemRow, curGolemCol, golemPoses);
 
         if (!result)
         {
