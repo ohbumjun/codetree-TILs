@@ -77,6 +77,17 @@ void Input()
 	for (int c = 0; c < L + 2; ++c)
 		Board[L+1][c] = 2;
 
+	// Debug
+	// {
+	// 	cout << "Board" << endl;
+	// 	for (int r = 0; r < L + 2; ++r)
+	// 	{
+	// 		for (int c = 0; c < L + 2; ++c)
+	// 			cout << Board[r][c] << " ";
+	// 		cout << endl;
+	// 	}
+	// }
+
 	for (int n = 0; n < N; ++n)
 	{
 		int r, c, h, w, k;
@@ -331,11 +342,7 @@ void Solve()
 		
 		// dir 에 따라 가장 끝 knight 를 확인해야 한다.
 		// int endKnight = knightsOnWay.back();
-
-		// if (checkMove(endKnight, dir) == false) // 만약 벽이라면, X
-		// {
-		// 	continue;
-		// }
+		
 		sort(knightsOnWay.begin(), knightsOnWay.end(), 
 			[dir](int leftK, int rightK) {
 				int leftStRow = stPos[leftK].first;
@@ -358,42 +365,85 @@ void Solve()
 
 				// 위
 				if (dir == 0)
-					return leftStRow < rightStRow;
+					return leftStRow > rightStRow; // 위가 뒤로
 				// 오
 				if (dir == 1)
-					return leftEndCol < rightEndCol;
+					return leftEndCol < rightEndCol; // 오른쪽이 뒤로
 				// 아
 				if (dir == 2)
-					return leftEndRow < rightEndRow;
+					return leftEndRow < rightEndRow; // 아래쪽이 뒤로
 				// 왼
 				if (dir == 3)
-					return leftStCol < rightStCol;
+					return leftStCol > rightStCol; // 왼쪽이 뒤로
 			});
 
+		bool allMoved = true;
+
 		// 각 knight 마다 이동 가능한지를 확인해야 한다.
+		// idx, row, col
+		vector<tuple<int, int, int>> oldPoses;
 		for (int i = knightsOnWay.size() - 1; i >= 0; --i)
 		{
 			// 만약 가능하다면, 모두 이동
-			int curKnight = knightsOnWay[i];
-			bool moveEnable = checkMove(curKnight, dir);
+			int movedKnight = knightsOnWay[i];
+			bool moveEnable = checkMove(movedKnight, dir);
 
+			// 여기서 일단 잠깐 이동은 시켜줘야 한다.
+			// 이후, allMoved 가 false 라면 다시 원상 복구 시켜주면 된다.
 			if (moveEnable == false)
-				continue;
+			{
+				allMoved = false;
+				break;
+			}
 
-			int stRow = stPos[curKnight].first;
-			int stCol = stPos[curKnight].second;
+			// 만약 가능하다면, 일단 이동 시키기
+			int stRow = stPos[movedKnight].first;
+			int stCol = stPos[movedKnight].second;
+
 			int nxtRow = stRow + dRow[dir];
 			int nxtCol = stCol + dCol[dir];
-			stPos[curKnight] = { nxtRow, nxtCol };
+
+			oldPoses.push_back({ movedKnight, stRow, stCol });
+			stPos[movedKnight] = { nxtRow, nxtCol };
+		}
+		
+		// 다시 원상 복구 시킨다.
+		for (int i = 0; i < oldPoses.size(); ++i)
+		{
+			int oldKnight, oldRow, oldCol;
+			tie(oldKnight, oldRow, oldCol) = oldPoses[i];
+			stPos[oldKnight] = { oldRow, oldCol };
+		}
+
+		// 하나라도 이동이 불가하다면 모든 녀석들 이동이 불가능하다.
+		if (allMoved == false)
+			continue;
+
+		for (int i = knightsOnWay.size() - 1; i >= 0; --i)
+		{
+			// 만약 가능하다면, 모두 이동
+			int movedKnight = knightsOnWay[i];
+
+			int stRow = stPos[movedKnight].first;
+			int stCol = stPos[movedKnight].second;
+
+			int nxtRow = stRow + dRow[dir];
+			int nxtCol = stCol + dCol[dir];
+
+			stPos[movedKnight] = { nxtRow, nxtCol };
+
+			// 민 주체는 데미지 X
+			if (movedKnight == knight)
+				continue;
 
 			// - 이후, 함정 계산
 			// - 사라지는 녀석 파악
-			int damage = calDamage(curKnight);
-			health[curKnight] -= damage;
-			totDamaged[curKnight] += damage;
-			if (health[curKnight] < 0)
+			int damage = calDamage(movedKnight);
+			health[movedKnight] -= damage;
+			totDamaged[movedKnight] += damage;
+			if (health[movedKnight] <= 0)
 			{
-				alive[curKnight] = false;
+				alive[movedKnight] = false;
 			}
 		}
 	}
