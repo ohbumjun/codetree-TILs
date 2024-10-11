@@ -203,6 +203,10 @@ void Solve()
 		}
 
 
+		// 1. move santa
+		// 2. dead time 처리 방식.
+
+
 		// 2. 모든 산타 이동
 		// - 기절, 탈락 제외
 		// - 루돌프 가까워지는 방향
@@ -242,7 +246,7 @@ void Solve()
 				+ (stCol - roudolfCol) * 
 				(stCol - roudolfCol);
 
-			int minDir = -1;
+			vector<int> santaNextDir;
 
 			for (int d = 0; d < 4; ++d)
 			{
@@ -258,21 +262,25 @@ void Solve()
 					(nxtRow - roudolfRow) 
 					+ (nxtCol - roudolfCol) * 
 					(nxtCol - roudolfCol);
-				if (curDist >= minDist)
-					continue;
-				minDist = curDist;
-				minDir = d;
+				if (curDist < minDist)
+				{
+					minDist = curDist;
+					santaNextDir.push_back(d);
+				}
 			}
 
-			if (minDir == -1)
+			if (santaNextDir.size() == 0)
 				continue;
+
+			// 맨 마지막
+			int minDir = santaNextDir[santaNextDir.size() - 1];
 
 			// 이동
 			int movedRow = stRow + dRow[minDir];
 			int movedCol = stCol + dCol[minDir];
+
 			stataPosMap[stRow][stCol] = -1;
-			stataPosMap[movedRow][movedCol] = p;
-			
+
 			// - 루돌프 충돌시 
 			//	- 점수
 			//	- 기절 처리
@@ -287,6 +295,11 @@ void Solve()
 				int addedC = dCol[moveDir];
 				moveSanta(movedRow, movedCol, D, p, 
 					addedR, addedC);
+			}
+			else
+			{
+				// 충돌 X
+				stataPosMap[movedRow][movedCol] = p;
 			}
 		}
 
