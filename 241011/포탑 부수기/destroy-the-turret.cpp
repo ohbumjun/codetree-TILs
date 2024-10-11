@@ -36,8 +36,8 @@ vector<vector<int>> lastAttackTurn;
 vector<vector<bool>> isInvolved;
 
 // 우 / 하 / 좌 / 상 + 대각선 4방향
-double dRow[] = {0, 1, 0, -1. -1, -1, 1, 1 };
-double dCol[] = { 1, 0, -1, 0, 1, -1, -1, 1 };
+int dRow[] = {0, 1, 0, -1, -1, -1, 1, 1 };
+int dCol[] = { 1, 0, -1, 0, 1, -1, -1, 1 };
 
 void Input()
 {
@@ -102,37 +102,61 @@ void Solve()
 				if (Board[r][c] == minAttack)
 					attackers.push_back({ r, c });
 		
-		// 정렬 이후 맨 뒤쪽에
-		sort(attackers.begin(), attackers.end(),
-			[](const pair<int, int>& left,
-				const pair<int, int>& right)
+		pair<int, int> attackInfo = attackers[0];
+
+		for (int a = 1; a < attackers.size(); ++a)
+		{
+			int existingRow = attackInfo.first;
+			int existingCol = attackInfo.second;
+
+			int attackRow = attackers[a].first;
+			int attackCol = attackers[a].second;
+
+			// b) 여러 개 ?
+			// -가장 최근에 공격한 포탑이 가장 약한 포탑
+			// - 맨 처음, 모든 포탑은 시점 0 에 공격한 경험 존재
+			// c) 여러개->행 + 열.합 가장 큰 것.
+			// d) 여러개 -> "열" 값 가장 큰 것.
+
+			// attackRow 에 해당하는 turn이 더 크면
+			// 더 최근에 공격했다는 의미이므로 바꾼다.
+			if (lastAttackTurn[existingRow][existingCol]
+				< lastAttackTurn[attackRow][attackCol])
 			{
-				int leftAttackTurn = lastAttackTurn[left.first][left.second];
-				int rightAttackTurn = lastAttackTurn[right.first][right.second];
+				attackInfo = { attackRow, attackCol };
+				continue;
+			}
+			else if (lastAttackTurn[existingRow][existingCol]
+				> lastAttackTurn[attackRow][attackCol])
+			{
+				continue;
+			}
+			
 
-				if (leftAttackTurn < rightAttackTurn)
-					return true;
-				if (rightAttackTurn < leftAttackTurn)
-					return false;
+			int existingSum = existingRow + existingCol;
+			int attackSum = attackRow + attackCol;
 
-				int leftRowColSum = left.first + left.second;
-				int rightRowColSum = right.first + right.second;
+			if (existingSum < attackSum)
+			{
+				attackInfo = { attackRow, attackCol };
+				continue;
+			}
+			else if (existingSum > attackSum)
+			{
+				continue;
+			}
 
-				if (leftRowColSum < rightRowColSum)
-					return true;
-				if (rightRowColSum < leftRowColSum)
-					return false;
-
-				int leftCol = left.second;
-				int rightCol = right.second;
-
-				if (leftCol < rightCol)
-					return true;
-				if (rightCol < leftCol)
-					return false;
-			});
-
-		const pair<int,int>& attackInfo = attackers.back();
+			if (existingCol < attackCol)
+			{
+				attackInfo = { attackRow, attackCol };
+				continue;
+			}
+			else if (existingCol > attackCol)
+			{
+				continue;
+			}
+		}
+		
 		int attackerRow = attackInfo.first;
 		int attackerCol = attackInfo.second;
 
@@ -160,9 +184,17 @@ void Solve()
 		// 일단 가장 큰 공격력이 무엇인지 판단
 		int maxAttack = 0;
 		for (int r = 0; r < totRow; ++r)
+		{
 			for (int c = 0; c < totCol; ++c)
+			{
+				// 공격자 제외.
+				if (r == attackerRow && c == attackerCol)
+					continue;
 				if (Board[r][c] != 0 && Board[r][c] > maxAttack)
 					maxAttack = Board[r][c];
+			}
+		}
+			
 
 		// 피해자 후보들을 모은다
 		for (int r = 0; r < totRow; ++r)
@@ -170,37 +202,52 @@ void Solve()
 				if (Board[r][c] == maxAttack)
 					victims.push_back({ r, c });
 
-		// 정렬 이후 맨 뒤쪽에
-		sort(victims.begin(), victims.end(),
-			[](const pair<int, int>& left,
-				const pair<int, int>& right)
+		pair<int, int> victimInfo = victims[0];
+
+		for (int v = 1; v < victims.size(); ++v)
+		{
+			int existingRow = victimInfo.first;
+			int existingCol = victimInfo.second;
+
+			int victimRow = victims[v].first;
+			int victimCol = victims[v].second;
+
+			if (lastAttackTurn[existingRow][existingCol]
+				> lastAttackTurn[victimRow][victimCol])
 			{
-				int leftAttackTurn = lastAttackTurn[left.first][left.second];
-				int rightAttackTurn = lastAttackTurn[right.first][right.second];
+				victimInfo = { victimRow, victimCol };
+				continue;
+			}
+			else if (lastAttackTurn[existingRow][existingCol]
+			< lastAttackTurn[victimRow][victimCol])
+			{
+				continue;
+			}
 
-				if (leftAttackTurn < rightAttackTurn)
-					return false;
-				if (rightAttackTurn < leftAttackTurn)
-					return true;
+			int existingSum = existingRow + existingCol;
+			int attackSum = victimRow + victimCol;
 
-				int leftRowColSum = left.first + left.second;
-				int rightRowColSum = right.first + right.second;
+			if (existingSum > attackSum)
+			{
+				victimInfo = { victimRow, victimCol };
+				continue;
+			}
+			else if (existingSum < attackSum)
+			{
+				continue;
+			}
 
-				if (leftRowColSum < rightRowColSum)
-					return false;
-				if (rightRowColSum < leftRowColSum)
-					return true;
+			if (existingCol > victimCol)
+			{
+				victimInfo = { victimRow, victimCol };
+				continue;
+			}
+			else if (existingCol < victimCol)
+			{
+				continue;
+			}
+		}
 
-				int leftCol = left.second;
-				int rightCol = right.second;
-
-				if (leftCol < rightCol)
-					return false;
-				if (rightCol < leftCol)
-					return true;
-			});
-
-		const pair<int,int>& victimInfo= victims.back();
 		int victimRow = victimInfo.first;
 		int victimCol = victimInfo.second;
 
@@ -302,10 +349,26 @@ void Solve()
 				// 공격자 X
 				if (nxtRow == attackerRow && nxtCol == attackerCol)
 					continue;
-				if (nxtRow == victimRow && nxtCol == victimCol)
-					Board[nxtRow][nxtCol] -= attackDamage;
+				potanAttacked.push_back({ nxtRow, nxtCol });
+				// if (nxtRow == victimRow && nxtCol == victimCol)
+				// 	Board[nxtRow][nxtCol] -= attackDamage;
+				// else
+				// 	Board[nxtRow][nxtCol] -= attackDamage / 2;
+			}
+
+			for (int idx = 0; idx < potanAttacked.size(); ++idx)
+			{
+				const pair<int, int>& curPos = potanAttacked[idx];
+				int curR = curPos.first;
+				int curC = curPos.second;
+
+				// 공격 개입 표시
+				isInvolved[curR][curC] = true;
+
+				if (curR == victimRow && curC == victimCol)
+					Board[curR][curC] -= attackDamage;
 				else
-					Board[nxtRow][nxtCol] -= attackDamage / 2;
+					Board[curR][curC] -= attackDamage / 2;
 			}
 		}
 		else
@@ -322,6 +385,16 @@ void Solve()
 				int curD = pathToVictim[idx];
 				int nxtRow = curAttackRow + dRow[curD];
 				int nxtCol = curAttackCol + dCol[curD];
+
+				// 범위 조정
+				if (nxtRow >= totRow)
+					nxtRow = 0;
+				if (nxtRow < 0)
+					nxtRow = totRow - 1;
+				if (nxtCol >= totCol)
+					nxtCol = 0;
+				if (nxtCol < 0)
+					nxtCol = totCol - 1;
 
 				// 공격 개입 표시
 				isInvolved[nxtRow][nxtCol] = true;
@@ -372,6 +445,14 @@ void Solve()
 				Board[r][c] += 1;
 			}
 		}
+
+		// Debug
+		// cout << " --------- " << endl;
+		// for (int r = 0; r < totRow; ++r) {
+		// 	for (int c = 0; c < totCol; ++c)
+		// 		cout << Board[r][c] << " ";
+		// 	cout << endl;
+		// }
 	}
 
 	// 가장 강한 공격력 출력하기.
