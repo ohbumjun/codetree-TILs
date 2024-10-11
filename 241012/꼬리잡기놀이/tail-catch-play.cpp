@@ -38,10 +38,6 @@ vector<int> Score;
 
 vector<vector<pair<int, int>>> GroupCans;
 
-// dir, st row, st col
-// 0 : 우, 1 : 상, 2 : 좌, 3 : 하
-vector<tuple<int, int, int>> Lines;
-
 // 4방향
 int dRow[] = { 0, -1, 0, 1 };
 int dCol[] = { 1, 0, -1, 0 };
@@ -126,46 +122,6 @@ void Input()
 	for (int r = 0; r < N; ++r)
 		for (int c = 0; c < N; ++c)
 			cin >> Board[r][c];
-
-	for (int d = 0; d < 4; ++d)
-	{
-		if (d == 0)
-		{
-			for (int n = 0; n < N; ++n)
-			{
-				int stRow = n;
-				int stCol = 0;
-				Lines.push_back({ 0, stRow, stCol });
-			}
-		}
-		else if (d == 1)
-		{
-			for (int n = 0; n < N; ++n)
-			{
-				int stRow = N - 1;
-				int stCol = n;
-				Lines.push_back({ 1, stRow, stCol });
-			}
-		}
-		else if (d == 2)
-		{
-			for (int n = 0; n < N; ++n)
-			{
-				int stRow = n;
-				int stCol = N - 1;
-				Lines.push_back({ 2, stRow, stCol });
-			}
-		}
-		else
-		{
-			for (int n = 0; n < N; ++n)
-			{
-				int stRow = 0;
-				int stCol = n;
-				Lines.push_back({ 3, stRow, stCol });
-			}
-		}
-	}
 
 	// 그룹을 만들기 위한 check 배열
 	vector<vector<bool>> tempCheck(N, vector<bool>(N, false));
@@ -447,7 +403,44 @@ void Solve()
 			moveGroup(grp);
 		
 		// 라인 쏘기
-		tie(d, stR, stC) = Lines[r];
+		// 시작 라인을 미리 정해두는 것이 아니라, 그때그때 구하는 방법 ?
+		// tie(d, stR, stC) = Lines[r];
+
+		int divd = r / N;
+		int rest = r % N;
+		d = divd;
+
+		if (divd == 0) // 위에서 아래로
+		{
+			// ex) N : 7, r = 6
+			stR = rest;
+			stC = 0;
+		}
+		else if (divd == 1) // 왼쪽에서 오른쪽
+		{
+			// ex) N : 7, r = 7
+			// int stRow = N - 1;
+			// int stCol = n;
+			stR = N - 1;
+			stC = rest;
+		}
+		else if (divd == 2) // 아래에서 위로
+		{
+			// int stRow = n;
+			// int stCol = N - 1;
+			// ex) N : 7, r = 14, div : 2, rest : 0
+			// ex) N : 7, r = 15, div : 2, rest : 1
+			stR = N - 1 - rest;
+			stC = N - 1;
+		}
+		else  if (divd == 3) // 오른쪽에서 왼쪽
+		{
+			// ex) N : 7, r = 22, div : 3, rest : 1
+			// int stRow = 0;
+			// int stCol = n;
+			stR = 0;
+			stC = N - 1 - rest;
+		}
 
 		for (int n = 0; n < N; ++n)
 		{
