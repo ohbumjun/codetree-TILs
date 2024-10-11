@@ -36,8 +36,8 @@ vector<vector<int>> lastAttackTurn;
 vector<vector<bool>> isInvolved;
 
 // 우 / 하 / 좌 / 상 + 대각선 4방향
-double  dRow[8] = { 0, 1, 0, -1. -1, -1, 1, 1 };
-double  dCol[8] = { 1, 0, -1, 0, 1, -1, -1, 1 };
+double dRow[] = {0, 1, 0, -1. -1, -1, 1, 1 };
+double dCol[] = { 1, 0, -1, 0, 1, -1, -1, 1 };
 
 void Input()
 {
@@ -130,8 +130,7 @@ void Solve()
 					return true;
 				if (rightCol < leftCol)
 					return false;
-			}
-        );
+			});
 
 		const pair<int,int>& attackInfo = attackers.back();
 		int attackerRow = attackInfo.first;
@@ -206,7 +205,7 @@ void Solve()
 		int victimCol = victimInfo.second;
 
 		// 공격 개입 true
-		isInvolved[attackerRow][attackerCol] = true;
+		isInvolved[victimRow][victimCol] = true;
 
 		/*
 		공격 종류 1) 레이저 공격
