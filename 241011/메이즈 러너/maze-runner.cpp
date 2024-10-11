@@ -131,9 +131,13 @@ void rotate(int stR, int stC, int height, int width)
 		partPoses[parti] = { newR, newC };
 
 		// 기존 위치에서 지우기
-		auto iter = find(partMap[partRow][partCol].begin(),
+		auto iter = std::find(partMap[partRow][partCol].begin(),
 			partMap[partRow][partCol].end(), parti);
-		int findIdx = distance(iter, partMap[partRow][partCol].begin());
+
+		assert(iter != partMap[partRow][partCol].end());
+
+		int findIdx = distance(partMap[partRow][partCol].begin(),
+			iter);
 		partMap[partRow][partCol].erase(
 			partMap[partRow][partCol].begin() + findIdx);
 
@@ -153,6 +157,8 @@ void rotate(int stR, int stC, int height, int width)
 
 void Input()
 {
+
+
 	cin >> N >> M >> K;
 
 	miros.resize(N, vector<int>(N, 0));
@@ -211,6 +217,7 @@ bool check(int stR, int stC, int edR, int edC)
 
 void Solve()
 {
+
 	// K 초 반복
 	// - 모든 참가자 중간에 탈출했다면 게임 X
 	for (int k = 0; k < K; ++k)
