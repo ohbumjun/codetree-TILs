@@ -334,6 +334,21 @@ void Solve()
 			}
 		}
 
+		// 이동 이후, 출구로 나간 탈락자들이 생기므로 한번 더 검사
+		allOut = true;
+
+		for (int m = 0; m < M; ++m)
+		{
+			if (isOut[m] == false)
+			{
+				allOut = false;
+				break;
+			}
+		}
+
+		if (allOut)
+			break;
+
 		// >> 미로 회전
 		// 한명이상 참가자. (2명도 가능) ~ 출구. 범위의
 		// "가장 작은" "정사각형" 잡기
@@ -347,9 +362,9 @@ void Solve()
 		for (int size = 2; size < N; ++size)
 		{
 			// 행 작, 열 작.
-			for (int r = 0; r < N - size; ++r)
+			for (int r = 0; r <= N - size; ++r)
 			{
-				for (int c = 0; c < N - size; ++c)
+				for (int c = 0; c <= N - size; ++c)
 				{
 					// 해당 위치부터 시작하여 
 					// 출구와, 참가자를 포함하는 정사각형 찾기
