@@ -159,10 +159,16 @@ void Solve()
 					continue;
 				int dist = (r - roudolfRow) * (r - roudolfRow) 
 					+ (c - roudolfCol) * (c - roudolfCol);
-				if (dist > minDist)
-					continue;
-				minDist = dist;
-				posToSantas.push_back({r, c});
+				if (dist < minDist)
+				{
+					minDist = dist;
+					posToSantas.clear();
+					posToSantas.push_back({ r, c });
+				}
+				else if (dist == minDist)
+				{
+					posToSantas.push_back({ r, c });
+				}
 			}
 		}
 
