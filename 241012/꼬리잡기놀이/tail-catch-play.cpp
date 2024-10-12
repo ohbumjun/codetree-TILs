@@ -215,6 +215,15 @@ void Solve()
 		for (int grp = stGroup; grp <= edGroup; ++grp)
 			moveGroup(grp);
 
+		// 디버그
+		// cout << "before line" << endl;
+		// for (int r = 0; r < N; ++r)
+		// {
+		// 	for (int c = 0; c < N; ++c)
+		// 		cout << Board[r][c] << " ";
+		// 	cout << endl;
+		// }
+
 		// 공 던지기
 		int lineDir, lineStRow, lineStCol;
 		int divdend = k / N;
@@ -247,18 +256,28 @@ void Solve()
 
 		for (int n = 0; n < N; ++n)
 		{
-			int curLineRow = lineStRow + dRow[lineDir];
-			int curLineCol = lineStCol + dCol[lineDir];
+			int curLineRow = lineStRow + dRow[lineDir] * n;
+			int curLineCol = lineStCol + dCol[lineDir] * n;
 			// 범위 아웃이면 안된다.
 			// 0 ~ 이동칸은 X
 			if (Board[curLineRow][curLineCol] <= 4)
-				break;
+				continue;
 			int metGroup = Board[curLineRow][curLineCol];
 			int metK = getK(metGroup, curLineRow, curLineCol);
 			Score[metGroup] += (metK * metK);
 			reverseGroup(metGroup);
+			// 맨 처음 한번만
 			break;
 		}
+
+		// 디버그
+		// cout << "after line" << endl;
+		// for(int r = 0; r < N; ++r)
+		// {
+		// 	for (int c = 0; c < N; ++c)
+		// 		cout << Board[r][c] << " ";
+		// 	cout << endl;
+		// }
 	}
 
 	int ans = 0;
