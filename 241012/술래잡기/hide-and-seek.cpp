@@ -75,7 +75,7 @@ void moveSulae()
 	}
 	else
 	{
-		bool changeDir = sulaeIncrease ?
+		int changeDir = sulaeIncrease ?
 			1 : -1;
 
 		// 나머지 경로상에 있는 경우.
@@ -398,6 +398,9 @@ void Solve()
 		{
 			int visRow = sulaePos.first + dRow[sulaeDir] * i;
 			int visCol = sulaePos.second + dCol[sulaeDir] * i;
+
+			if (visRow < 0 || visRow >= N || visCol < 0 || visCol >= N)
+				continue;
 
 			if (Tree[visRow][visCol])
 				continue;
