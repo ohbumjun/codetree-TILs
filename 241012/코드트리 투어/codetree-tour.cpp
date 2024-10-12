@@ -97,15 +97,16 @@ void func4() {
         return;
     }
     else {
-        while (!packages.empty()) {
-            packageInfo now = packages.top();
-            if (!checkId[now.id]) {
+        // while (!packages.empty()) 
+        // {
+            packageInfo hello = packages.top();
+            if (!checkId[hello.id]) {
                 packages.pop();
             }
             else {
-                break;
+                //break;
             }
-        }
+       // }
         if (packages.empty()) {
             cout << -1 << "\n";
             return;
