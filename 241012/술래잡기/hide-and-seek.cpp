@@ -47,7 +47,6 @@ vector<bool> Alives;
 // 만약 메모리 초과 걸리면, 그냥 1차원 벡터로 변경
 vector<vector<bool>> Tree;
 
-int sulaeRow, sulaeCol;
 int sulaePathIdx = 0;
 bool sulaeIncrease = true; // 정방향, 역방향
 int sulaeDir = 0; // 맨 처음 위 방향
@@ -284,9 +283,6 @@ void Solve()
 
 	extractSulaePath();
 
-	sulaeRow = N / 2;
-	sulaeCol = N / 2;
-
 	for (int turn = 1; turn <= K; ++turn)
 	{
 		/*
@@ -314,6 +310,8 @@ void Solve()
 			const tuple<int, int, int>& runnerInfo = Runners[m];
 			int runRow, runCol, runDir;
 			tie(runRow, runCol, runDir) = runnerInfo;
+			int sulaeRow = sulaePath[sulaePathIdx].first;
+			int sulaeCol = sulaePath[sulaePathIdx].second;
 			int dist = abs(runRow - sulaeRow) + 
 				abs(runCol - sulaeCol);
 			if (dist > 3)
