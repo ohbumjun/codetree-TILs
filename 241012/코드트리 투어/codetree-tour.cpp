@@ -187,7 +187,7 @@ void Solve()
 			int dest = stoi(infos[3].c_str());
 			// int dest = *infos[3].c_str() - '0';
 
-			managedList[id] = { 0, rev, dest };
+			managedList[id] = { currentCity, rev, dest };
 		}
 		else if (cmdKind == "300")
 		{
@@ -281,6 +281,8 @@ void Solve()
 				int pId = iter->first;
 				managedList[pId].stCity = s;
 			}
+
+			currentCity = s;
 		}
 	}
 }
