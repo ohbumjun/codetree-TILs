@@ -218,6 +218,9 @@ void Solve()
 		getline(cin, cmdStrings, '\n');
 		vector<string> infos = splitStr(cmdStrings, ' ');
 
+        if (infos.size() == 0)
+            break;
+
 		string cmdKind = infos[0];
 
 		if (cmdKind == "200")
