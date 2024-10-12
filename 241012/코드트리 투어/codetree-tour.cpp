@@ -54,6 +54,39 @@ vector<string> splitStr(string input, char deli)
 	return answer;
 }
 
+void calDist(int stCity, int curCity, int sum,
+	vector<bool>& check)
+{
+	if (check[curCity])
+		return;
+
+	if (minDistGraph[stCity][curCity] != INT_MAX &&
+		minDistGraph[stCity][curCity] < sum)
+	{
+		// 기존 연결 정보가 이미 있었는데
+		// 해당 기존 정보가 더 거리가 작다면 return;
+		return;
+	}
+
+	// 정보 update
+	minDistGraph[stCity][curCity] = sum;
+
+	check[curCity] = true;
+
+	for (int nxt = 0; nxt < N; ++nxt)
+	{
+		// 같은 도시
+		if (nxt == curCity)
+			continue;
+		// 연결되어 있는 정보가 아니라면
+		if (minDistGraph[curCity][nxt] == INT_MAX)
+			continue;
+		calDist(stCity, nxt, sum + 
+			minDistGraph[curCity][nxt], check);
+	}
+
+	check[curCity] = false;
+}
 void Input()
 {
 	cin >> Q;
@@ -91,28 +124,42 @@ void Input()
 		// int weight = *firstCmds[idx * 3 + 2].c_str() - '0';
 
 		// 방향 없는 간선
-		minDistGraph[city1][city2] = min(minDistGraph[city1][city2], weight);
-		minDistGraph[city2][city1] = min(minDistGraph[city2][city1], weight);
+		minDistGraph[city1][city2] = min(
+			minDistGraph[city1][city2], weight);
+		minDistGraph[city2][city1] = min(
+			minDistGraph[city2][city1], weight);
 	}
 
 	// 각 도시 사이의 최단 거리 정보를 update 해줘야 한다.
-	// 알고리즘 사용
-	for (int k = 0; k < N; ++k)
+	// 알고리즘 사용 -> 이거는 시간 초과.
+	// for (int k = 0; k < N; ++k)
+	// {
+	// 	for (int f = 0; f < N; ++f)
+	// 	{
+	// 		for (int s = 0; s < N; ++s)
+	// 		{
+	// 			if (f == k || s == k)
+	// 				continue;
+	// 			int FKDist = minDistGraph[f][k];
+	// 			int SKDist = minDistGraph[k][s];
+	// 			minDistGraph[f][s] = min(
+	// 				minDistGraph[f][s], FKDist + SKDist);
+	// 		}
+	// 	}
+	// }
+
+	// dfs 를 통해서 각 정점까지의 거리 정보를 update 해야 한다.
+	// check 배열 (1차원)
+	// 거리 누적
+	// 시작 st 는 계속 넘겨주기
+	// 해당 거리까지의 최단 거리 정보 update 시켜주기
+	for (int city = 0; city < N; ++city)
 	{
-		for (int f = 0; f < N; ++f)
-		{
-			for (int s = 0; s < N; ++s)
-			{
-				if (f == k || s == k)
-					continue;
-				int FKDist = minDistGraph[f][k];
-				int SKDist = minDistGraph[k][s];
-				minDistGraph[f][s] = min(
-					minDistGraph[f][s], FKDist + SKDist);
-			}
-		}
+		vector<bool> check(N, false);
+		calDist(city, city, 0, check);
 	}
 }
+
 
 void Solve()
 {
